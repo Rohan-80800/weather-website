@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps Places Example</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <script>
+        let map;
+        let placesService;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 0, lng: 0 },
+                zoom: 8
+            });
+            placesService = new google.maps.places.PlacesService(map);
+        }
+
+        function searchPlaces() {
+            const city = document.getElementById('city').value;
+
+            if (!city) {
+                alert('Please enter a city.');
+                return;
+            }
+
+            const request = {
+                query: city,
+                fields: ['name', 'geometry']
+            };
+
+            placesService.findPlaceFromQuery(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    map.setCenter(results[0].geometry.location);
+                    map.setZoom(12);
+
+                    const marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location
+                    });
+
+                    // You can do further operations with the results, like fetching more places, etc.
+                } else {
+                    alert('Places service failed due to: ' + status);
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <form onsubmit="event.preventDefault(); searchPlaces()">
+        <input type="text" id="city" placeholder="Enter a city">
+        <button type="submit">Search</button>
+    </form>
+    <div id="map" style="height: 400px; width: 100%;"></div>
+</body>
+</html>
